@@ -100,7 +100,7 @@ async def get_data_folder():
         "folder": settings.data_folder
     }
 
-@app.delete("/api/delete_entries/",
+@app.delete("/api/delete_entries123/",
             responses={
              404: {"description": "Запись не найден"}
          })
