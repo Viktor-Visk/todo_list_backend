@@ -121,5 +121,15 @@ if __name__ == "__main__":
 
 
 
+@app.delete("/api/delete_entries123/",
+            responses={
+             404: {"description": "Запись не найден"}
+         })
+async def delete_entries(entry: str):
+    """
+    Удаляет родительскую (верхнеуровневую) сущность
+    """
+    entry_manager = EntryManager(settings.data_folder).load()
 
+    success = entry_manager.delete(entry)
 
