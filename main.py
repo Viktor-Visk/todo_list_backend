@@ -106,7 +106,7 @@ async def get_data_folder():
          })
 async def delete_entries(entry: str):
     """
-    Удаляет родительскую (верхнеуровневую) сущность
+    Удаляет сущность по ее названию
     """
     entry_manager = EntryManager(settings.data_folder).load()
 
