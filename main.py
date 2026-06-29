@@ -100,7 +100,7 @@ async def get_data_folder():
         "folder": settings.data_folder
     }
 
-@app.delete("/api/delete_entries123/",
+@app.delete("/api/delete_entries/",
             responses={
              404: {"description": "Запись не найден"}
          })
@@ -119,17 +119,4 @@ async def delete_entries(entry: str):
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
 
-
-
-@app.delete("/api/delete_entries123/",
-            responses={
-             404: {"description": "Запись не найден"}
-         })
-async def delete_entries(entry: str):
-    """
-    Удаляет родительскую (верхнеуровневую) сущность
-    """
-    entry_manager = EntryManager(settings.data_folder).load()
-
-    success = entry_manager.delete(entry)
 
