@@ -77,17 +77,48 @@ class EntryManager:
 
     def delete(self, entry_name: str) -> bool:
         """ Удаляет запись из списка и стирает её файл с диска """
+        # Проверяем, является ли удаляемый элемент корневым (файлом)
         for entry in self.entries:
-            # Проверяем совпадение по id (убедитесь, что у класса Entry есть поле id)
             if entry.title == entry_name:
-                # 1. Формируем путь и удаляем файл с диска
+                # Формируем путь и удаляем файл с диска
                 filename = f"{entry.title}.json"
                 file_path = os.path.join(self.data_path, filename)
+                # Стираем файл в системе
                 if os.path.isfile(file_path):
                     os.remove(file_path)
-
-                # 2. Удаляем объект из списка в памяти
+                # Удаляем объект из списка в памяти
                 self.entries.remove(entry)
-                return True  # Удаление прошло успешно
+                return True
 
-        return False  # Запись не была найдена
+        def _delete_recursive(current_node) -> bool:
+            # Пытаемся достать список дочерних элементов (как атрибут или как ключ словаря)
+            children = getattr(current_node, "entries", None)
+            if children is None and isinstance(current_node, dict):
+                children = current_node.get("entries")
+
+            if not children or not isinstance(children, list):
+                return False
+
+            # Проверяем прямых детей на текущем уровне
+            for child in children:
+                child_title = getattr(child, "title", None)
+                if child_title is None and isinstance(child, dict):
+                    child_title = child.get("title")
+
+                if child_title == entry_name:
+                    children.remove(child)
+                    return True
+
+            # Если на этом уровне не нашли, идем глубже по дереву
+            for child in children:
+                if _delete_recursive(child):
+                    return True
+            return False
+        # Если файл целиком не удален, ищем элемент внутри дерева каждого Entry
+        for entry in self.entries:
+            if _delete_recursive(entry):
+                # Сохраняем обновленную структуру обратно в файл
+                entry.save(self.data_path)
+                return True
+
+        return False
